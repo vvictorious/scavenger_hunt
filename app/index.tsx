@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Text, View, StyleSheet, Image } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import ImageViewer from "@/components/ImageViewer";
@@ -50,7 +51,7 @@ export default function Index() {
   };
 
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
       <EmojiPicker isVisible={isModalVisible} onClose={onModalClose}>
         <EmojiList onSelect={setPickedEmoji} onCloseModal={onModalClose} />
       </EmojiPicker>
@@ -90,7 +91,7 @@ export default function Index() {
         {/* A list of emoji component will go here */}
       </EmojiPicker>
       <StatusBar style="auto" />
-    </View>
+    </GestureHandlerRootView>
   );
 }
 
