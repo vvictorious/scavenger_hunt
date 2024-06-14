@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Text, View, StyleSheet, ViewProps } from "react-native";
+import { Text, View, StyleSheet, Platform } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import ImageViewer from "@/components/ImageViewer";
 import Button from "@/components/Button";
@@ -12,6 +12,7 @@ import EmojiList from "@/components/EmojiList";
 import EmojiSticker from "@/components/EmojiSticker";
 import * as MediaLibrary from "expo-media-library";
 import { captureRef } from "react-native-view-shot";
+import domtoimage from 'dom-to-image';
 
 const PlaceholderImage = require("../assets/images/background-image.png");
 
@@ -23,7 +24,7 @@ export default function Index() {
 
   const [status, requestPermission] = MediaLibrary.usePermissions();
 
-  const imageRef = useRef<View>(null);
+  const imageRef = useRef<any>(null);
 
 
   if (status === null) {
@@ -43,19 +44,37 @@ export default function Index() {
   };
 
   const onSaveImageAsync = async () => {
-    try {
-      const localUri = await captureRef(imageRef, {
-        height: 440,
-        quality: 1,
-      });
-
-      await MediaLibrary.saveToLibraryAsync(localUri);
-      if (localUri) {
-        alert("Saved!");
+    if (Platform.OS !== 'web' ) {
+      try {
+        const localUri = await captureRef(imageRef, {
+          height: 440,
+          quality: 1,
+        });
+  
+        await MediaLibrary.saveToLibraryAsync(localUri);
+        if (localUri) {
+          alert("Saved!");
+        }
+      } catch (e) {
+        console.log(e);
       }
-    } catch (e) {
-      console.log(e);
+    } else {
+      try {
+        const dataUrl = await domtoimage.toJpeg(imageRef.current, {
+          quality: 0.95,
+          width: 320,
+          height: 440,
+        });
+  
+        let link = document.createElement('a');
+        link.download = 'sticker-smash.jpeg';
+        link.href = dataUrl;
+        link.click();
+      } catch (e) {
+        console.log(e);
+      }
     }
+
   };
 
   const pickImageAsync = async () => {
